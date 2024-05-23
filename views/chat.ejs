@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        html, body, div, span {
+            
+        }
+
+        body {
+            background: url("https://www.bootdey.com/img/bgy.png") no-repeat fixed center;
+            background-size: cover;
+        }
+
+        .fa-2x {
+            font-size: 1.5em;
+        }
+
+        .app {
+            position: relative;
+            overflow: hidden;
+            top: 19px;
+            height: calc(100% - 38px);
+            margin: auto;
+            padding: 0;
+            box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .06), 0 2px 5px 0 rgba(0, 0, 0, .2);
+        }
+
+        .app-one {
+            background-color: #f7f7f7;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .06), 0 2px 5px 0 rgba(0, 0, 0, .2);
+        }
+
+        .heading {
+            padding: 10px 16px 10px 15px;
+            margin: 0;
+            height: 60px;
+            width: 100%;
+            background-color: #eee;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+
+        .heading-avatar {
+            cursor: pointer;
+        }
+
+        .heading-avatar-icon img {
+            border-radius: 50%;
+            height: 40px;
+            width: 40px;
+        }
+
+        .heading-name {
+            cursor: pointer;
+            margin-left: 15px;
+            flex-grow: 1;
+        }
+
+        .heading-name-meta {
+            font-weight: 700;
+            font-size: 100%;
+            padding: 5px;
+            padding-bottom: 0;
+            text-align: left;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #000;
+            display: block;
+        }
+
+        .message {
+            padding: 0 !important;
+            margin: 0 !important;
+            background-size: cover;
+            overflow-y: auto;
+            border: 1px solid #f7f7f7;
+            height: calc(100% - 120px);
+            padding: 15px;
+        }
+
+        .message-body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: auto;
+            height: auto;
+        }
+
+        .message-main-receiver {
+            max-width: 60%;
+            margin-bottom: 15px;
+        }
+
+        .message-main-sender {
+            max-width: 60%;
+            margin-left: auto;
+            margin-bottom: 15px;
+        }
+
+        .message-text {
+            margin: 0 !important;
+            padding: 10px;
+            word-wrap: break-word;
+            font-weight: 200;
+            font-size: 14px;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .sender .message-text {
+            background: #dcf8c6;
+        }
+
+        .message-username {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .reply {
+            height: 60px;
+            width: 100%;
+            background-color: #f5f1ee;
+            padding: 10px 5px !important;
+            margin: 0 !important;
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .reply-main textarea {
+            width: 100%;
+            resize: none;
+            overflow: hidden;
+            padding: 5px !important;
+            outline: none;
+            border: none;
+            text-indent: 5px;
+            box-shadow: none;
+            height: 100%;
+            font-size: 16px;
+        }
+
+        .reply-send {
+            padding: 5px !important;
+        }
+
+        .reply-send button {
+            text-align: center;
+            padding: 5px;
+            color: #93918f;
+            cursor: pointer;
+            background: none;
+            border: none;
+            outline: none;
+        }
+
+        .sidebar {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100; /* Higher z-index to be above sidebar */
+            cursor: pointer;
+            display: none; /* Initially hidden on mobile */
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -250px;
+                top: 0;
+                height: 100%;
+                width: 250px;
+                transition: left 0.3s;
+                z-index: 1000; /* To overlay on top of the chat area */
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .app-one {
+                overflow: auto;
+            }
+
+            .app-one.active {
+                overflow: hidden;
+            }
+
+            .conversation {
+                position: relative;
+                z-index: 900; /* Below the sidebar */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container app">
+        <div class="row app-one">
+            <!-- Sidebar Toggle for Mobile -->
+            <div class="sidebar-toggle">
+                <i class="fa fa-bars fa-2x"></i>
+            </div>
+            <!-- Sidebar -->
+            <div class="col-sm-4 col-md-3 sidebar">
+                <div class="sidebar-toggle">
+                    <i class="fa fa-bars fa-2x"></i>
+                </div>
+                <h2>All Users</h2>
+                <span>message each user privately coming soon.....</span>
+                <ul id="userList" class="list-unstyled"></ul>
+            </div>
+            <!-- Main Chat Area -->
+            <div class="col-sm-8 col-md-9 conversation">
+                <div class="row heading">
+                    <div class="col-sm-2 col-md-1 col-xs-3 heading-avatar">
+                        <div class="heading-avatar-icon">
+                            <img src="https://bootdey.com/img/Content/avatar/avatar6.png" alt="User Avatar">
+                        </div>
+                    </div>
+                    <div class="col-sm-8 col-xs-7 heading-name">
+                        <a class="heading-name-meta" id="user">User</a>
+                    </div>
+                </div>
+                <div class="row message" id="conversation">
+                    <!-- Messages will be appended here -->
+                </div>
+                <div class="row reply">
+                    <div class="col-sm-1 col-xs-1 reply-emojis">
+                        <i class="fa fa-smile-o fa-2x"></i>
+                    </div>
+                    <div class="col-sm-9 col-xs-9 reply-main">
+                        <textarea class="form-control" rows="1" id="input"></textarea>
+                    </div>
+                    <div class="col-sm-1 col-xs-1 reply-send">
+                        <button type="submit" class="fa fa-send fa-2x"></button>
+                    </div>
+                </div>
+                <form id="form" action="" style="display: none;"></form> <!-- Hidden form for submission -->
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const token = '<%= token %>'; // Pass the token to the client-side script
+        const socket = io({ query: { token } });
+
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messages = document.getElementById('conversation');
+        const userElement = document.getElementById('user');
+        const userList = document.getElementById('userList');
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const appOne = document.querySelector('.app-one');
+
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            appOne.classList.toggle('active');
+        });
+
+        // Listen for 'users' event to update the user list in the sidebar
+        socket.on('users', function(users) {
+            userList.innerHTML = ''; // Clear the existing list
+            users.forEach(function(user) {
+                const li = document.createElement('li');
+                li.textContent = user.username;
+                userList.appendChild(li);
+            });
+        });
+
+        // Listen for the 'username' event and update the HTML element
+        socket.on('username', function(username) {
+            userElement.textContent = username;
+        });
+
+        // Display previous messages
+        socket.on('previous messages', function(messagesArray) {
+            messagesArray.forEach(function(msg) {
+                addMessage(msg.user, msg.msg);
+            });
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
+        });
+
+        document.querySelector('.reply-send button').addEventListener('click', function() {
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
+        });
+
+        socket.on('chat message', function(msg) {
+            addMessage(msg.user, msg.msg);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+
+        function addMessage(user, msg) {
+            const messageBody = document.createElement('div');
+            messageBody.className = 'message-body';
+            const messageMain = document.createElement('div');
+            messageMain.className = user === userElement.textContent ? 'message-main-sender sender' : 'message-main-receiver receiver';
+
+            const messageUsername = document.createElement('div');
+            messageUsername.className = 'message-username';
+            messageUsername.textContent = user;
+
+            const messageText = document.createElement('div');
+            messageText.className = 'message-text';
+            messageText.textContent = msg;
+
+            messageMain.appendChild(messageUsername);
+            messageMain.appendChild(messageText);
+            messageBody.appendChild(messageMain);
+            messages.appendChild(messageBody);
+        }
+    </script>
+</body>
+</html>
